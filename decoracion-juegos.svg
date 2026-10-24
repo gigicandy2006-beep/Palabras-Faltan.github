@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <pattern id="cloud-texture" width="15" height="13" patternUnits="userSpaceOnUse">
+      <path d="M2 4l5-2m2 8 4-2" stroke="#8ecde5" stroke-width="1.5" stroke-linecap="round" opacity=".62"/>
+    </pattern>
+    <clipPath id="heart-shape">
+      <path d="M0 24C-48-5-40-39-17-39-3-39 0-27 0-27s3-12 17-12C40-39 48-5 0 24z"/>
+    </clipPath>
+    <g id="flower">
+      <path d="M0 11v36m0-15q-17-16-29-8m29 14q16-15 29-8" fill="none" stroke="#62ae67" stroke-width="5" stroke-linecap="round"/>
+      <g stroke="#e985a9" stroke-width="3.5" stroke-linejoin="round">
+        <ellipse cy="-13" ry="13" rx="8" fill="#ff9abd"/>
+        <ellipse cy="13" ry="13" rx="8" fill="#ff9abd"/>
+        <ellipse cx="-13" rx="13" ry="8" fill="#ff9abd"/>
+        <ellipse cx="13" rx="13" ry="8" fill="#ff9abd"/>
+      </g>
+      <circle r="7" fill="#ffdb55" stroke="#e4aa31" stroke-width="3"/>
+    </g>
+    <g id="cloud">
+      <path d="M-43 17c-18 0-23-24-6-32 3-25 37-29 49-8 22-11 43 12 27 31-5 7-12 9-20 9z" fill="#d9f3ff" stroke="#62b5d4" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M-43 17c-18 0-23-24-6-32 3-25 37-29 49-8 22-11 43 12 27 31-5 7-12 9-20 9z" fill="url(#cloud-texture)"/>
+      <path d="M-22 3q6 6 12 0m16 0q6 6 12 0" fill="none" stroke="#488da9" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <g id="sun">
+      <g stroke="#efa937" stroke-width="5" stroke-linecap="round">
+        <path d="M0-53v12m0 82v12m53-53H41m-82 0h-12m50-38-9-9m58 58 9 9m0-58-9 9m-58 58-9 9"/>
+        <circle r="31" fill="#ffdb4e"/>
+      </g>
+      <circle cx="-10" cy="-7" r="3" fill="#634b45"/><circle cx="10" cy="-7" r="3" fill="#634b45"/>
+      <path d="M-11 5q11 12 22 0m-30-2h6m36 0h6" fill="none" stroke="#634b45" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M-24 0h5m38 0h5" stroke="#ed8ba1" stroke-width="5" stroke-linecap="round"/>
+    </g>
+    <g id="frog" stroke="#398758" stroke-width="5" stroke-linejoin="round">
+      <path d="M-43-12q-36-3-29 27 7 22 37 7m78-34q36-3 29 27-7 22-37 7" fill="#79d879"/>
+      <ellipse cy="7" rx="54" ry="48" fill="#78d875"/>
+      <ellipse cx="-26" cy="-32" rx="21" ry="22" fill="#86e27e"/><ellipse cx="26" cy="-32" rx="21" ry="22" fill="#86e27e"/>
+      <circle cx="-25" cy="-32" r="7" fill="#fff"/><circle cx="25" cy="-32" r="7" fill="#fff"/>
+      <circle cx="-24" cy="-31" r="3.5" fill="#31433a" stroke="none"/><circle cx="26" cy="-31" r="3.5" fill="#31433a" stroke="none"/>
+      <ellipse cy="17" rx="30" ry="23" fill="#baf1a1" stroke="#65b965"/>
+      <path d="M-19 7q19 21 38 0" fill="none" stroke="#355d46" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="-37" cy="8" r="4" fill="#4fa85e" stroke="none"/><circle cx="38" cy="-1" r="4" fill="#4fa85e" stroke="none"/>
+    </g>
+    <g id="bee" stroke="#8f6a2c" stroke-width="4" stroke-linejoin="round">
+      <ellipse cx="-15" cy="-25" rx="20" ry="15" fill="#dcf5ff" opacity=".9"/><ellipse cx="17" cy="-25" rx="20" ry="15" fill="#dcf5ff" opacity=".9"/>
+      <ellipse cy="5" rx="43" ry="32" fill="#ffda4d"/>
+      <path d="M-18-27q-11-18-24-13m60 13q11-18 24-13" fill="none" stroke-linecap="round"/>
+      <path d="M-21-26q-10 31 0 61m22-62q10 31 0 62" fill="none" stroke="#76552d" stroke-width="8"/>
+      <circle cx="-18" cy="0" r="3.5" fill="#453a34" stroke="none"/><circle cx="18" cy="0" r="3.5" fill="#453a34" stroke="none"/>
+      <path d="M-10 13q10 9 20 0" fill="none" stroke="#453a34" stroke-width="3" stroke-linecap="round"/>
+      <path d="M-36 8h9m49 0h9" stroke="#ef8d9e" stroke-width="5" stroke-linecap="round"/>
+    </g>
+    <g id="star" stroke="#dfaa30" stroke-width="4" stroke-linejoin="round">
+      <path d="M0-31 9-10 31-9 14 5 20 29 0 16-20 29-14 5-31-9-9-10z" fill="#ffdb4e"/>
+      <path d="M-4-17v12" stroke="#fff7c6" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <g id="rainbow" fill="none" stroke-linecap="round">
+      <path d="M-55 25a55 55 0 0 1 110 0" stroke="#ef6f7d" stroke-width="13"/>
+      <path d="M-42 25a42 42 0 0 1 84 0" stroke="#ffcd4f" stroke-width="12"/>
+      <path d="M-29 25a29 29 0 0 1 58 0" stroke="#6ecb80" stroke-width="11"/>
+      <path d="M-16 25a16 16 0 0 1 32 0" stroke="#67bce0" stroke-width="10"/>
+    </g>
+  </defs>
+  <g stroke-linecap="round" stroke-linejoin="round" opacity=".92">
+    <use href="#frog" transform="translate(112 144) scale(.78)"/>
+    <use href="#bee" transform="translate(320 103) scale(.72) rotate(-8)"/>
+    <use href="#sun" transform="translate(1081 118) scale(.7)"/>
+    <use href="#cloud" transform="translate(105 358) scale(.88)"/>
+    <use href="#star" transform="translate(250 294) scale(.62) rotate(-9)"/>
+    <use href="#rainbow" transform="translate(1094 441) scale(.78)"/>
+    <use href="#cloud" transform="translate(1040 475) scale(.48)"/>
+    <use href="#star" transform="translate(83 575) scale(.58) rotate(8)"/>
+    <g transform="translate(1110 692)">
+      <path d="M0 39c-57-34-48-77-21-78C-5-39 0-24 0-24s5-15 21-15c27 1 36 44-21 78z" fill="#fff" stroke="#f080a8" stroke-width="5"/>
+      <g clip-path="url(#heart-shape)" stroke-width="8">
+        <path d="M-54-30h108" stroke="#ef6d72"/><path d="M-54-18h108" stroke="#ffa94f"/>
+        <path d="M-54-6h108" stroke="#ffdc4c"/><path d="M-54 6h108" stroke="#68c87d"/>
+        <path d="M-54 18h108" stroke="#62b9df"/><path d="M-54 30h108" stroke="#c88bdd"/>
+      </g>
+    </g>
+    <use href="#flower" transform="translate(89 793) scale(.83)"/>
+    <use href="#flower" transform="translate(167 824) scale(.62) rotate(-7)"/>
+    <use href="#flower" transform="translate(244 792) scale(.78) rotate(5)"/>
+    <use href="#flower" transform="translate(919 802) scale(.74) rotate(-5)"/>
+    <use href="#flower" transform="translate(1000 826) scale(.6)"/>
+    <use href="#flower" transform="translate(1171 807) scale(.78) rotate(7)"/>
+    <use href="#sun" transform="translate(438 824) scale(.38)"/>
+    <use href="#bee" transform="translate(760 817) scale(.5) rotate(8)"/>
+  </g>
+</svg>

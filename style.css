@@ -6,7 +6,7 @@
 
 body {
     font-family: "Arial", sans-serif;
-    background: radial-gradient(circle at top, #fffaf0 0%, #fce7f3 22%, #dff9ff 52%, #e8f7d9 100%);
+    background: url("../proyecto2.1/.vscode/banner-infantil.svg") center / cover fixed no-repeat;
     min-height: 100vh;
     color: #2b2d42;
 }
@@ -35,7 +35,8 @@ header {
     display: flex;
     align-items: center;
     gap: 18px;
-    width: 100%;
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 .logo {
@@ -86,41 +87,26 @@ main {
     isolation: isolate;
     overflow: hidden;
     padding: 105px 35px 78px;
-    background: #fff url("banner-infantil.svg") center / cover no-repeat;
-}
-
-#menu::before,
-#menu::after {
-    content: "";
-    position: absolute;
-    z-index: -1;
-    pointer-events: none;
+    background: #fff url("../proyecto2.1/.vscode/banner-infantil.svg") center / cover no-repeat;
 }
 
 #menu {
     position: relative;
     isolation: isolate;
     overflow: hidden;
-    background: linear-gradient(135deg, #e9f6f0 0%, #eaf4ff 54%, #fff5df 100%);
 }
 
-#menu::before {
-    top: -70px;
-    left: 14%;
-    width: 190px;
-    height: 190px;
-    background: rgba(255, 197, 132, 0.24);
-    clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
-}
-
-#menu::after {
-    right: -72px;
-    bottom: -100px;
-    width: 260px;
-    height: 260px;
-    background: rgba(164, 190, 231, 0.2);
-    clip-path: polygon(50% 0, 100% 100%, 0 100%);
-    transform: rotate(-18deg);
+#menu,
+#juego,
+#memoria {
+    background-color: #fff;
+    background-image:
+        url("decoracion-juegos.svg"),
+        linear-gradient(rgba(55, 112, 103, 0.09) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(55, 112, 103, 0.09) 1px, transparent 1px);
+    background-size: 100% 100%, 32px 32px, 32px 32px;
+    background-position: center, 0 0, 0 0;
+    background-repeat: no-repeat, repeat, repeat;
 }
 
 .pantalla h2 {
@@ -355,15 +341,6 @@ button:focus-visible {
     margin-bottom: 25px;
 }
 
-#juego,
-#memoria {
-    background-color: #fff;
-    background-image:
-        linear-gradient(rgba(55, 112, 103, 0.09) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(55, 112, 103, 0.09) 1px, transparent 1px);
-    background-size: 32px 32px;
-}
-
 .memoria-barra {
     margin-bottom: 24px;
 }
@@ -398,8 +375,14 @@ button:focus-visible {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 12px;
-    width: min(100%, 560px);
+    width: min(100%, 720px);
     margin: 0 auto;
+    transition: gap 0.35s ease;
+}
+
+.memoria-tablero.memoria-completa {
+    width: min(100%, 820px);
+    gap: 16px;
 }
 
 .carta-memoria {
@@ -448,7 +431,36 @@ button:focus-visible {
     transform: rotateY(180deg);
     background: #fffaf0;
     border-color: #f0d797;
-    font-size: 38px;
+}
+
+.ilustracion-memoria {
+    display: block;
+    width: 84%;
+    height: 84%;
+    background-image: url("ilustraciones-memoria.svg");
+    background-size: 400% 200%;
+    background-repeat: no-repeat;
+    transition: transform 0.2s ease;
+}
+
+.carta-memoria.encontrada .ilustracion-memoria {
+    transform: scale(1.08);
+}
+
+.ilustracion-memoria-rana { background-position: 0 0; }
+.ilustracion-memoria-abeja { background-position: 33.333% 0; }
+.ilustracion-memoria-sol { background-position: 66.666% 0; }
+.ilustracion-memoria-arcoiris { background-position: 100% 0; }
+.ilustracion-memoria-estrella { background-position: 0 100%; }
+.ilustracion-memoria-corazon { background-position: 33.333% 100%; }
+.ilustracion-memoria-flores { background-position: 66.666% 100%; }
+.ilustracion-memoria-cohete { background-position: 100% 100%; }
+
+@media (prefers-reduced-motion: reduce) {
+    .memoria-tablero,
+    .ilustracion-memoria {
+        transition: none;
+    }
 }
 
 .carta-memoria.encontrada .frente-carta-memoria {
@@ -535,7 +547,7 @@ button:focus-visible {
 }
 
 .mensaje {
-    min-height: 30px;
+    min-height: 94px;
     margin-top: 15px;
     font-weight: bold;
     font-size: 18px;
@@ -546,9 +558,23 @@ button:focus-visible {
 }
 
 .reaccion {
-    font-size: 34px;
-    line-height: 1;
-    animation: reaccion-saltar 0.55s ease-out;
+    flex: 0 0 82px;
+    width: 82px;
+    height: 82px;
+    object-fit: contain;
+}
+
+.reaccion-feliz {
+    animation: reaccion-feliz 1.5s ease-in-out infinite;
+}
+
+.reaccion-triste {
+    animation: reaccion-triste 2s ease-in-out infinite;
+}
+
+.mensaje-texto {
+    max-width: 300px;
+    text-align: left;
 }
 
 .confeti {
@@ -605,10 +631,14 @@ button:focus-visible {
     }
 }
 
-@keyframes reaccion-saltar {
-    0% { transform: scale(0.5) rotate(-15deg); }
-    65% { transform: scale(1.2) rotate(8deg); }
-    100% { transform: scale(1) rotate(0); }
+@keyframes reaccion-feliz {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    50% { transform: translateY(-7px) rotate(-4deg); }
+}
+
+@keyframes reaccion-triste {
+    0%, 100% { transform: translateY(1px) rotate(0); }
+    50% { transform: translateY(-3px) rotate(2deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -621,6 +651,15 @@ button:focus-visible {
     }
 
     .gota-lluvia {
+        animation: none;
+    }
+
+    #resultados.derrota-activa::before {
+        animation: none;
+        background-image: none;
+    }
+
+    .mascota-derrota {
         animation: none;
     }
 }
@@ -657,13 +696,17 @@ button:focus-visible {
 .diploma {
     display: none;
     position: relative;
-    max-width: 560px;
+    max-width: 600px;
     margin: 0 auto 24px;
-    padding: 28px 26px 22px;
-    border-radius: 28px;
-    background: linear-gradient(135deg, #fffaf0 0%, #ffe8a3 28%, #dff7ff 100%);
-    border: 4px solid #f5b700;
-    box-shadow: 0 18px 34px rgba(199, 137, 0, 0.22);
+    padding: 22px 26px 24px;
+    border: 4px solid #f1bf38;
+    border-radius: 18px;
+    background-color: #fffefa;
+    background-image:
+        linear-gradient(rgba(69, 164, 186, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(69, 164, 186, 0.1) 1px, transparent 1px);
+    background-size: 22px 22px;
+    box-shadow: 5px 6px 0 #f18bb0, 0 16px 28px rgba(54, 88, 105, 0.16);
     overflow: hidden;
 }
 
@@ -671,21 +714,21 @@ button:focus-visible {
 .diploma::after {
     content: "";
     position: absolute;
-    width: 140px;
-    height: 140px;
+    width: 74px;
+    height: 74px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.18);
+    background: rgba(255, 216, 79, 0.28);
     z-index: 0;
 }
 
 .diploma::before {
-    top: -60px;
-    left: -35px;
+    top: -35px;
+    left: -25px;
 }
 
 .diploma::after {
     right: -25px;
-    bottom: -60px;
+    bottom: -35px;
 }
 
 .diploma > * {
@@ -697,55 +740,133 @@ button:focus-visible {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 18px;
-    margin-bottom: 10px;
+    gap: 14px;
+    margin-bottom: 14px;
 }
 
-.diploma-badge,
-.diploma-ornamento {
-    font-size: 44px;
-    filter: drop-shadow(0 5px 10px rgba(255, 180, 0, 0.35));
+.diploma-estrella {
+    color: #ffc83d;
+    font-size: 30px;
+    text-shadow: 1px 2px 0 #e99c36;
+}
+
+.diploma-sello {
+    padding: 7px 18px;
+    border-radius: 999px;
+    background: #61c77b;
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    box-shadow: 0 3px 0 #3e9d5a;
 }
 
 .diploma h3 {
-    color: #8a4b00;
-    font-size: 28px;
-    margin-bottom: 6px;
+    color: #347451;
+    font-size: 25px;
+    margin-bottom: 8px;
     text-align: center;
     line-height: 1.2;
 }
 
 .diploma-subtitulo {
-    color: #9a6a1f;
-    font-size: 15px;
+    color: #4f7580;
+    font-size: 13px;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
+    letter-spacing: 0;
     text-align: center;
-    margin-bottom: 14px;
+    margin-bottom: 8px;
 }
 
-.diploma-mascota {
-    font-size: 68px;
-    text-align: center;
-    margin: 8px 0 12px;
-    animation: mascota-bob 2s ease-in-out infinite;
+.diploma-ilustracion {
+    display: block;
+    width: min(220px, 62vw);
+    height: 170px;
+    object-fit: contain;
+    margin: 0 auto 8px;
+    animation: nino-saltar 1.7s ease-in-out infinite;
 }
 
 .diploma p {
-    color: #5f4b2f;
-    font-size: 18px;
+    color: #465e69;
+    font-size: 17px;
     font-weight: bold;
     line-height: 1.5;
     text-align: center;
 }
 
-@keyframes mascota-bob {
-    0%, 100% { transform: translateY(0) rotate(-5deg); }
-    50% { transform: translateY(-8px) rotate(5deg); }
+@keyframes nino-saltar {
+    0%, 100% { transform: translateY(2px) rotate(-1deg); }
+    50% { transform: translateY(-8px) rotate(1deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .diploma-ilustracion {
+        animation: none;
+    }
 }
 
 .trofeo {
     font-size: 80px;
+}
+
+#resultados.derrota-activa {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+}
+
+#resultados.derrota-activa::before {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    inset: -35% -20%;
+    pointer-events: none;
+    opacity: 0.42;
+    background-image: repeating-linear-gradient(
+        105deg,
+        transparent 0 28px,
+        rgba(81, 176, 215, 0.7) 29px 31px,
+        transparent 32px 73px
+    );
+    background-size: 96px 130px;
+    animation: lluvia-final 0.55s linear infinite;
+}
+
+#resultados.derrota-activa > * {
+    position: relative;
+    z-index: 1;
+}
+
+#resultados.derrota-activa .trofeo {
+    display: none;
+}
+
+.mascota-derrota {
+    display: none;
+    width: min(230px, 58vw);
+    height: 210px;
+    object-fit: contain;
+    margin: 0 auto 8px;
+    filter: drop-shadow(0 5px 8px rgba(94, 163, 186, 0.2));
+    animation: mascota-derrota 2s ease-in-out infinite;
+}
+
+#resultados.derrota-activa .mascota-derrota {
+    display: block;
+}
+
+#resultados.derrota-activa #tituloResultados {
+    color: #47778a;
+}
+
+@keyframes lluvia-final {
+    to { transform: translate3d(0, 130px, 0); }
+}
+
+@keyframes mascota-derrota {
+    0%, 100% { transform: translateY(1px); }
+    50% { transform: translateY(-5px); }
 }
 
 .secundario {
@@ -772,12 +893,15 @@ footer {
 
     header {
         padding: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
     }
 
     .banner-marca {
         flex-direction: column-reverse;
         gap: 4px;
         text-align: center;
+        flex: 1 1 100%;
     }
 
     .logo {

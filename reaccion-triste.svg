@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 140">
+  <style>
+    .tear { opacity: 0; transform-box: fill-box; transform-origin: center; animation: tear-fall 1.8s ease-in infinite; }
+    .tear.two { animation-delay: .9s; }
+    .ripple { transform-box: fill-box; transform-origin: center; animation: ripple 1.8s ease-out infinite; }
+    @keyframes tear-fall {
+      0%, 12% { opacity: 0; transform: translateY(-5px); }
+      25% { opacity: 1; }
+      78% { opacity: 1; transform: translateY(15px); }
+      100% { opacity: 0; transform: translateY(20px); }
+    }
+    @keyframes ripple {
+      0%, 70%, 100% { opacity: .2; transform: scaleX(.75); }
+      82% { opacity: .8; transform: scaleX(1.08); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .tear, .ripple { animation: none; }
+      .tear { opacity: .9; }
+      .ripple { opacity: .55; }
+    }
+  </style>
+  <ellipse cx="75" cy="119" rx="45" ry="11" fill="#b8e8f5" stroke="#72c4df" stroke-width="4"/>
+  <ellipse class="ripple" cx="75" cy="118" rx="27" ry="5" fill="none" stroke="#f5ffff" stroke-width="3"/>
+  <path d="M75 103q-35 0-37-31l3-31q2-22 34-22t34 22l3 31q-2 31-37 31z" fill="#fff" stroke="#99a9b4" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M47 49q8-10 16 0m24 0q8-10 16 0" fill="none" stroke="#697887" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M50 64q7-8 14 0m22 0q7-8 14 0" fill="none" stroke="#475765" stroke-width="4" stroke-linecap="round"/>
+  <path d="M67 79q8-8 16 0" fill="none" stroke="#778592" stroke-width="4" stroke-linecap="round"/>
+  <path d="M40 67c-8 10-9 17-2 20 7 0 8-8 2-20zm70 0c-8 10-9 17-2 20 7 0 8-8 2-20z" fill="#79cfea" stroke="#4ba9cd" stroke-width="2"/>
+  <path class="tear one" d="M42 79c-8 12-10 18-3 21 7 1 9-8 3-21z" fill="#62c6e8" stroke="#47a9cb" stroke-width="2"/>
+  <path class="tear two" d="M108 79c-8 12-10 18-3 21 7 1 9-8 3-21z" fill="#62c6e8" stroke="#47a9cb" stroke-width="2"/>
+  <path d="M31 114q-8 3-13-2m114 2q8 3 13-2" fill="none" stroke="#95cfe0" stroke-width="3" stroke-linecap="round"/>
+</svg>

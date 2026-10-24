@@ -5,11 +5,10 @@ let puntos = 0;
 let estrellas = 3;
 let rachaActual = 0;
 let dificultadActual = "facil";
+let indiceRespuestaCorrecta = 0;
 
 const juegosConDiploma = [1, 2, 3, 5];
-const reaccionesAcierto = ["🥳", "🤩", "🦸", "🐸", "🎉", "⭐"];
-const reaccionesError = ["🙈", "😅", "🤔", "🐢", "🦊", "💪"];
-const emojisMemoria = ["🐼", "🌸", "🚀", "🍎", "🦋", "🐸", "⚽", "🌈"];
+const ilustracionesMemoria = ["rana", "abeja", "sol", "arcoiris", "estrella", "corazon", "flores", "cohete"];
 
 let cartasMemoria = [];
 let cartasVolteadas = [];
@@ -17,6 +16,7 @@ let intentosMemoria = 0;
 let parejasMemoriaEncontradas = 0;
 let memoriaBloqueada = false;
 let temporizadorMemoria = null;
+let contextoAudioEfectos = null;
 
 const juegos = {
 
@@ -317,6 +317,382 @@ function mostrarPantalla(id) {
 }
 
 
+function reproducirEfecto(tipo) {
+    const ConstructorAudio = window.AudioContext || window.webkitAudioContext;
+    if (!ConstructorAudio) {
+        return;
+    }
+
+    if (!contextoAudioEfectos) {
+        contextoAudioEfectos = new ConstructorAudio();
+    }
+
+    const emitir = () => {
+        const ahora = contextoAudioEfectos.currentTime;
+
+        if (tipo === "seleccion") {
+            reproducirTono(contextoAudioEfectos, 523.25, ahora, 0.11, 0.026);
+            reproducirTono(contextoAudioEfectos, 659.25, ahora + 0.025, 0.09, 0.01);
+        } else if (tipo === "acierto") {
+            [659.25, 783.99, 987.77].forEach((frecuencia, indice) => {
+                reproducirTono(contextoAudioEfectos, frecuencia, ahora + indice * 0.075, 0.15, 0.045);
+            });
+        } else if (tipo === "error") {
+            reproducirTono(contextoAudioEfectos, 392, ahora, 0.12, 0.032);
+            reproducirTono(contextoAudioEfectos, 329.63, ahora + 0.1, 0.16, 0.032);
+        } else if (tipo === "lluvia") {
+            reproducirRuidoLluvia(contextoAudioEfectos, ahora);
+        }
+    };
+
+    if (contextoAudioEfectos.state === "suspended") {
+        contextoAudioEfectos.resume().then(emitir).catch(() => {});
+    } else if (contextoAudioEfectos.state === "running") {
+        emitir();
+    }
+}
+
+
+function reproducirTono(contexto, frecuencia, inicio, duracion, nivel) {
+    const oscilador = contexto.createOscillator();
+    const volumen = contexto.createGain();
+
+    oscilador.type = "sine";
+    oscilador.frequency.setValueAtTime(frecuencia, inicio);
+    volumen.gain.setValueAtTime(0.0001, inicio);
+    volumen.gain.exponentialRampToValueAtTime(nivel, inicio + 0.015);
+    volumen.gain.exponentialRampToValueAtTime(0.0001, inicio + duracion);
+    oscilador.connect(volumen);
+    volumen.connect(contexto.destination);
+    oscilador.start(inicio);
+    oscilador.stop(inicio + duracion + 0.01);
+}
+
+
+function reproducirRuidoLluvia(contexto, inicio) {
+    const duracion = 0.45;
+    const muestras = Math.floor(contexto.sampleRate * duracion);
+    const buffer = contexto.createBuffer(1, muestras, contexto.sampleRate);
+    const datos = buffer.getChannelData(0);
+
+    for (let indice = 0; indice < muestras; indice++) {
+        datos[indice] = Math.random() * 2 - 1;
+    }
+
+    const fuente = contexto.createBufferSource();
+    const filtroAgudo = contexto.createBiquadFilter();
+    const filtroSuave = contexto.createBiquadFilter();
+    const volumen = contexto.createGain();
+
+    fuente.buffer = buffer;
+    filtroAgudo.type = "highpass";
+    filtroAgudo.frequency.setValueAtTime(500, inicio);
+    filtroSuave.type = "lowpass";
+    filtroSuave.frequency.setValueAtTime(2600, inicio);
+    volumen.gain.setValueAtTime(0.0001, inicio);
+    volumen.gain.exponentialRampToValueAtTime(0.034, inicio + 0.05);
+    volumen.gain.exponentialRampToValueAtTime(0.0001, inicio + duracion);
+    fuente.connect(filtroAgudo);
+    filtroAgudo.connect(filtroSuave);
+    filtroSuave.connect(volumen);
+    volumen.connect(contexto.destination);
+    fuente.start(inicio);
+    fuente.stop(inicio + duracion);
+}
+
+
+document.addEventListener("click", evento => {
+    const boton = evento.target.closest("button");
+    if (boton && !boton.disabled) {
+        reproducirEfecto("seleccion");
+    }
+}, true);
+
+
+async function solicitarEvaluacion(ruta, opciones = {}) {
+    const respuesta = await fetch(ruta, {
+        ...opciones,
+        headers: {
+            "Content-Type": "application/json",
+            ...(opciones.headers || {})
+        }
+    });
+    const datos = await respuesta.json().catch(() => ({}));
+    if (!respuesta.ok) {
+        throw new Error(datos.error || "No se pudo completar la operación.");
+    }
+    return datos;
+}
+
+
+function mensajeErrorConexionEvaluacion(error) {
+    if (window.location.protocol === "file:") {
+        return "Abre la dirección web de la evaluación; no funciona al abrir index.html directamente.";
+    }
+    return error.message;
+}
+
+
+async function autenticarDocente() {
+    const input = document.getElementById("claveDocente");
+    const error = document.getElementById("errorClaveDocente");
+    if (!input.value) {
+        error.textContent = "Escribe la contraseña de la profesora.";
+        return;
+    }
+
+    error.textContent = "Verificando acceso...";
+    try {
+        const acceso = await solicitarEvaluacion("/api/docente/acceso", {
+            method: "POST",
+            body: JSON.stringify({ password: input.value })
+        });
+        tokenAccesoDocente = acceso.teacherToken;
+        input.value = "";
+        error.textContent = "Acceso habilitado.";
+        document.getElementById("accesoDocente").hidden = true;
+        document.getElementById("iniciarEvaluacionDocente").hidden = false;
+    } catch (errorAcceso) {
+        error.textContent = mensajeErrorConexionEvaluacion(errorAcceso);
+    }
+}
+
+
+async function crearEvaluacionDocente() {
+    const estado = document.getElementById("estadoDocente");
+    if (!tokenAccesoDocente) {
+        estado.textContent = "Primero ingresa la contraseña de profesora.";
+        return;
+    }
+    estado.textContent = "Preparando la evaluación...";
+
+    try {
+        sesionDocente = await solicitarEvaluacion("/api/evaluaciones", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${tokenAccesoDocente}` }
+        });
+        document.getElementById("codigoEvaluacionCompartir").textContent = sesionDocente.code;
+        const enlace = document.getElementById("enlaceEvaluacion");
+        enlace.href = sesionDocente.joinUrl;
+        enlace.textContent = sesionDocente.joinUrl;
+        document.getElementById("iniciarEvaluacionDocente").hidden = true;
+        document.getElementById("panelEvaluacionActiva").hidden = false;
+        mostrarPantalla("panelDocente");
+        await actualizarPanelDocente();
+        temporizadorPanelDocente = window.setInterval(actualizarPanelDocente, 2000);
+    } catch (error) {
+        estado.textContent = mensajeErrorConexionEvaluacion(error);
+    }
+}
+
+
+async function actualizarPanelDocente() {
+    if (!sesionDocente) {
+        return;
+    }
+
+    try {
+        const datos = await solicitarEvaluacion(`/api/evaluaciones/${sesionDocente.code}`, {
+            headers: { Authorization: `Bearer ${sesionDocente.teacherToken}` }
+        });
+        pintarResultadosDocente(datos.students);
+        const estado = document.getElementById("estadoEvaluacionDocente");
+        estado.textContent = datos.active ? "Evaluación abierta" : "Evaluación detenida";
+        document.getElementById("botonDetenerEvaluacion").disabled = !datos.active;
+        if (!datos.active && temporizadorPanelDocente !== null) {
+            window.clearInterval(temporizadorPanelDocente);
+            temporizadorPanelDocente = null;
+        }
+    } catch (error) {
+        document.getElementById("estadoDocente").textContent = mensajeErrorConexionEvaluacion(error);
+    }
+}
+
+
+function pintarResultadosDocente(estudiantes) {
+    const cuerpo = document.getElementById("listaResultadosEvaluacion");
+    cuerpo.replaceChildren();
+
+    if (estudiantes.length === 0) {
+        const fila = cuerpo.insertRow();
+        const celda = fila.insertCell();
+        celda.colSpan = 4;
+        celda.textContent = "Esperando a los estudiantes...";
+        return;
+    }
+
+    estudiantes.forEach(estudiante => {
+        const fila = cuerpo.insertRow();
+        fila.insertCell().textContent = estudiante.name;
+        fila.insertCell().textContent = estudiante.submitted ? "Terminó" : "Respondiendo";
+        fila.insertCell().textContent = estudiante.submitted ? `${estudiante.correct}/10` : "—";
+        fila.insertCell().textContent = estudiante.submitted ? `${estudiante.grade.toFixed(1)} / 5` : "—";
+    });
+}
+
+
+async function detenerEvaluacionDocente() {
+    if (!sesionDocente) {
+        return;
+    }
+
+    const boton = document.getElementById("botonDetenerEvaluacion");
+    boton.disabled = true;
+    try {
+        await solicitarEvaluacion(`/api/evaluaciones/${sesionDocente.code}/cerrar`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${sesionDocente.teacherToken}` }
+        });
+        await actualizarPanelDocente();
+    } catch (error) {
+        boton.disabled = false;
+        document.getElementById("estadoDocente").textContent = mensajeErrorConexionEvaluacion(error);
+    }
+}
+
+
+async function unirseEvaluacion() {
+    const nombre = document.getElementById("nombreEstudianteEvaluacion").value.trim();
+    const codigo = document.getElementById("codigoEvaluacionEntrada").value.replace(/\D/g, "").slice(0, 6);
+    const estado = document.getElementById("errorAccesoEvaluacion");
+
+    if (!nombre || codigo.length !== 6) {
+        estado.textContent = "Escribe tu nombre y el código de 6 cifras.";
+        return;
+    }
+
+    estado.textContent = "Conectando con la evaluación...";
+    try {
+        const acceso = await solicitarEvaluacion(`/api/evaluaciones/${codigo}/alumnos`, {
+            method: "POST",
+            body: JSON.stringify({ name: nombre })
+        });
+        sesionEstudiante = {
+            code: codigo,
+            name: nombre,
+            studentId: acceso.studentId,
+            studentToken: acceso.studentToken,
+            questions: acceso.questions,
+            answers: []
+        };
+        indicePreguntaEvaluacion = 0;
+        mostrarPreguntaEvaluacion();
+        mostrarPantalla("evaluacionEstudiante");
+        temporizadorEstadoEstudiante = window.setInterval(revisarEstadoEstudiante, 2500);
+    } catch (error) {
+        estado.textContent = mensajeErrorConexionEvaluacion(error);
+    }
+}
+
+
+function mostrarPreguntaEvaluacion() {
+    const pregunta = sesionEstudiante.questions[indicePreguntaEvaluacion];
+    respuestaSeleccionadaEvaluacion = null;
+    document.getElementById("progresoEvaluacion").textContent = `Pregunta ${indicePreguntaEvaluacion + 1} de ${sesionEstudiante.questions.length}`;
+    document.getElementById("preguntaEvaluacion").textContent = pregunta.prompt;
+    document.getElementById("fraseEvaluacion").textContent = pregunta.sentence;
+    document.getElementById("estadoEstudianteEvaluacion").textContent = "Selecciona una respuesta.";
+    const opciones = document.getElementById("opcionesEvaluacion");
+    opciones.replaceChildren();
+
+    pregunta.choices.forEach((texto, indice) => {
+        const boton = document.createElement("button");
+        boton.type = "button";
+        boton.textContent = texto;
+        boton.setAttribute("aria-pressed", "false");
+        boton.addEventListener("click", () => seleccionarRespuestaEvaluacion(indice, boton));
+        opciones.appendChild(boton);
+    });
+
+    const siguiente = document.getElementById("siguienteEvaluacion");
+    siguiente.disabled = true;
+    siguiente.textContent = indicePreguntaEvaluacion === sesionEstudiante.questions.length - 1
+        ? "Entregar evaluación"
+        : "Siguiente";
+}
+
+
+function seleccionarRespuestaEvaluacion(indice, botonElegido) {
+    respuestaSeleccionadaEvaluacion = indice;
+    document.querySelectorAll("#opcionesEvaluacion button").forEach(boton => {
+        boton.classList.toggle("seleccionada", boton === botonElegido);
+        boton.setAttribute("aria-pressed", String(boton === botonElegido));
+    });
+    document.getElementById("siguienteEvaluacion").disabled = false;
+    document.getElementById("estadoEstudianteEvaluacion").textContent = "Respuesta seleccionada.";
+}
+
+
+async function avanzarEvaluacionEstudiante() {
+    if (!sesionEstudiante || respuestaSeleccionadaEvaluacion === null) {
+        return;
+    }
+
+    const pregunta = sesionEstudiante.questions[indicePreguntaEvaluacion];
+    sesionEstudiante.answers.push({ questionId: pregunta.id, answerIndex: respuestaSeleccionadaEvaluacion });
+
+    if (indicePreguntaEvaluacion < sesionEstudiante.questions.length - 1) {
+        indicePreguntaEvaluacion++;
+        mostrarPreguntaEvaluacion();
+        return;
+    }
+
+    const boton = document.getElementById("siguienteEvaluacion");
+    boton.disabled = true;
+    document.getElementById("estadoEstudianteEvaluacion").textContent = "Entregando respuestas...";
+
+    try {
+        const datos = await solicitarEvaluacion(`/api/evaluaciones/${sesionEstudiante.code}/alumnos/${sesionEstudiante.studentId}/respuestas`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${sesionEstudiante.studentToken}` },
+            body: JSON.stringify({ answers: sesionEstudiante.answers })
+        });
+        sesionEstudiante.result = datos.result;
+        if (temporizadorEstadoEstudiante !== null) {
+            window.clearInterval(temporizadorEstadoEstudiante);
+            temporizadorEstadoEstudiante = null;
+        }
+        mostrarResultadoEvaluacion(datos.result);
+    } catch (error) {
+        boton.disabled = false;
+        document.getElementById("estadoEstudianteEvaluacion").textContent = error.message;
+    }
+}
+
+
+async function revisarEstadoEstudiante() {
+    if (!sesionEstudiante) {
+        return;
+    }
+
+    try {
+        const datos = await solicitarEvaluacion(`/api/evaluaciones/${sesionEstudiante.code}/alumnos/${sesionEstudiante.studentId}`, {
+            headers: { Authorization: `Bearer ${sesionEstudiante.studentToken}` }
+        });
+        if (!datos.active && !datos.submitted) {
+            window.clearInterval(temporizadorEstadoEstudiante);
+            temporizadorEstadoEstudiante = null;
+            document.querySelectorAll("#opcionesEvaluacion button").forEach(boton => { boton.disabled = true; });
+            document.getElementById("siguienteEvaluacion").disabled = true;
+            document.getElementById("estadoEstudianteEvaluacion").textContent = "La profesora detuvo la evaluación. Tus respuestas no se entregaron.";
+        }
+    } catch {
+        document.getElementById("estadoEstudianteEvaluacion").textContent = "Se perdió la conexión con el servidor.";
+    }
+}
+
+
+function mostrarResultadoEvaluacion(resultado) {
+    document.getElementById("nombreResultadoEvaluacion").textContent = `¡Buen trabajo, ${sesionEstudiante.name}!`;
+    document.getElementById("aciertosResultadoEvaluacion").textContent = `${resultado.correct} de ${resultado.total} respuestas correctas`;
+    document.getElementById("notaResultadoEvaluacion").textContent = resultado.grade.toFixed(1);
+    document.getElementById("mensajeResultadoEvaluacion").textContent = resultado.grade === 5
+        ? "¡Excelente! Lograste la nota máxima."
+        : "Tu resultado ya fue enviado a la profesora.";
+    mostrarPantalla("resultadoEvaluacion");
+}
+
+
 function comenzarJuego() {
 
     nombreJugador = document.getElementById("nombre").value.trim();
@@ -396,7 +772,20 @@ function mostrarPregunta() {
 
     document.getElementById("siguiente").style.display = "none";
 
-    datos.opciones.forEach((opcion, indice) => {
+    const opcionesMezcladas = datos.opciones.map((opcion, indice) => ({
+        opcion,
+        esCorrecta: indice === datos.respuesta
+    }));
+
+    for (let indice = opcionesMezcladas.length - 1; indice > 0; indice--) {
+        const indiceAleatorio = Math.floor(Math.random() * (indice + 1));
+        [opcionesMezcladas[indice], opcionesMezcladas[indiceAleatorio]] =
+            [opcionesMezcladas[indiceAleatorio], opcionesMezcladas[indice]];
+    }
+
+    indiceRespuestaCorrecta = opcionesMezcladas.findIndex(opcion => opcion.esCorrecta);
+
+    opcionesMezcladas.forEach(({ opcion }, indice) => {
 
         const boton = document.createElement("button");
 
@@ -409,20 +798,24 @@ function mostrarPregunta() {
 }
 
 
-function mostrarMensajeReaccion(emoji, texto) {
+function mostrarMensajeReaccion(tipo, texto) {
     const mensaje = document.getElementById("mensaje");
-    const reaccion = document.createElement("span");
+    const reaccion = document.createElement("img");
     const contenido = document.createElement("span");
 
-    reaccion.className = "reaccion";
-    reaccion.textContent = emoji;
+    reaccion.className = `reaccion reaccion-${tipo}`;
+    reaccion.src = tipo === "feliz" ? "reaccion-feliz.svg" : "reaccion-triste.svg";
+    reaccion.alt = "";
     reaccion.setAttribute("aria-hidden", "true");
+    contenido.className = "mensaje-texto";
     contenido.textContent = texto;
     mensaje.replaceChildren(reaccion, contenido);
 }
 
 
 function lanzarConfeti() {
+    reproducirEfecto("acierto");
+
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         return;
     }
@@ -465,6 +858,8 @@ function lanzarConfeti() {
 
 
 function lanzarLluvia() {
+    reproducirEfecto("lluvia");
+
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         return;
     }
@@ -497,7 +892,7 @@ function comprobarRespuesta(indice) {
         boton.disabled = true;
     });
 
-    if (indice === datos.respuesta) {
+    if (indice === indiceRespuestaCorrecta) {
 
         botones[indice].classList.add("correcta");
 
@@ -509,17 +904,16 @@ function comprobarRespuesta(indice) {
 
         const textoMensaje =
             rachaActual > 1
-                ? `🔥 ¡Racha de ${rachaActual}! +${puntosGanados} puntos.`
-                : `🎉 ¡Excelente! +${puntosGanados} puntos.`;
-        const emoji = reaccionesAcierto[Math.floor(Math.random() * reaccionesAcierto.length)];
+                ? `¡Racha de ${rachaActual}! +${puntosGanados} puntos.`
+                : `¡Excelente! +${puntosGanados} puntos.`;
 
-        mostrarMensajeReaccion(emoji, textoMensaje);
+        mostrarMensajeReaccion("feliz", textoMensaje);
         lanzarConfeti();
 
     } else {
 
         botones[indice].classList.add("incorrecta");
-        botones[datos.respuesta].classList.add("correcta");
+        botones[indiceRespuestaCorrecta].classList.add("correcta");
 
         rachaActual = 0;
 
@@ -533,9 +927,7 @@ function comprobarRespuesta(indice) {
 
         actualizarEstrellas();
 
-        const emoji = reaccionesError[Math.floor(Math.random() * reaccionesError.length)];
-
-        mostrarMensajeReaccion(emoji, "Respuesta incorrecta. ¡Sigue intentando!");
+        mostrarMensajeReaccion("triste", "Respuesta incorrecta. ¡Sigue intentando!");
         lanzarLluvia();
 
         if (estrellas <= 0) {
@@ -588,6 +980,13 @@ function finalizarJuego() {
     document.getElementById("estrellasFinales").textContent =
         estrellas;
 
+    const derrota = estrellas === 0;
+    const resultados = document.getElementById("resultados");
+    resultados.classList.toggle("derrota-activa", derrota);
+    document.getElementById("tituloResultados").textContent = derrota
+        ? "¡No te rindas!"
+        : "¡Juego terminado!";
+
     const diploma = document.getElementById("diploma");
     const diplomaTexto = document.getElementById("diplomaTexto");
     const diplomaTitulo = document.getElementById("diplomaTitulo");
@@ -609,6 +1008,8 @@ function finalizarJuego() {
         mensaje = "👏 ¡Muy bien! Sigue practicando para mejorar.";
     } else if (estrellas === 1) {
         mensaje = "💪 ¡Buen esfuerzo! Puedes intentarlo nuevamente.";
+    } else if (derrota) {
+        mensaje = "Se acabaron las estrellas, pero puedes volver a intentarlo.";
     } else {
         mensaje = "📚 Sigue practicando y lo conseguirás.";
     }
@@ -661,9 +1062,9 @@ function iniciarMemoria() {
     memoriaBloqueada = false;
 
     const contenidoCartas = [];
-    emojisMemoria.forEach((emoji, pareja) => {
-        contenidoCartas.push({ emoji, pareja });
-        contenidoCartas.push({ emoji, pareja });
+    ilustracionesMemoria.forEach((ilustracion, pareja) => {
+        contenidoCartas.push({ ilustracion, pareja });
+        contenidoCartas.push({ ilustracion, pareja });
     });
 
     for (let indice = contenidoCartas.length - 1; indice > 0; indice--) {
@@ -678,6 +1079,7 @@ function iniciarMemoria() {
     document.getElementById("estadoMemoria").textContent = "¡Encuentra las parejas!";
 
     const tablero = document.getElementById("tableroMemoria");
+    tablero.classList.remove("memoria-completa");
     tablero.replaceChildren();
 
     cartasMemoria.forEach((carta, indice) => {
@@ -695,8 +1097,11 @@ function iniciarMemoria() {
         reverso.textContent = "?";
         reverso.setAttribute("aria-hidden", "true");
         frente.className = "cara-carta-memoria frente-carta-memoria";
-        frente.textContent = carta.emoji;
         frente.setAttribute("aria-hidden", "true");
+        const ilustracion = document.createElement("span");
+        ilustracion.className = `ilustracion-memoria ilustracion-memoria-${carta.ilustracion}`;
+        ilustracion.setAttribute("aria-hidden", "true");
+        frente.appendChild(ilustracion);
 
         interior.append(reverso, frente);
         boton.appendChild(interior);
@@ -716,7 +1121,7 @@ function voltearCartaMemoria(indice, boton) {
     carta.volteada = true;
     boton.classList.add("volteada");
     boton.setAttribute("aria-pressed", "true");
-    boton.setAttribute("aria-label", `Carta ${indice + 1}: ${carta.emoji}`);
+    boton.setAttribute("aria-label", `Carta ${indice + 1}: ${carta.ilustracion}`);
     cartasVolteadas.push({ carta, boton, indice });
 
     if (cartasVolteadas.length < 2) {
@@ -729,25 +1134,28 @@ function voltearCartaMemoria(indice, boton) {
 
     const [primera, segunda] = cartasVolteadas;
     if (primera.carta.pareja === segunda.carta.pareja) {
+        reproducirEfecto("acierto");
         primera.carta.encontrada = true;
         segunda.carta.encontrada = true;
         primera.boton.classList.add("encontrada");
         segunda.boton.classList.add("encontrada");
         primera.boton.disabled = true;
         segunda.boton.disabled = true;
-        primera.boton.setAttribute("aria-label", `Carta ${primera.indice + 1}: ${primera.carta.emoji}, pareja encontrada`);
-        segunda.boton.setAttribute("aria-label", `Carta ${segunda.indice + 1}: ${segunda.carta.emoji}, pareja encontrada`);
+        primera.boton.setAttribute("aria-label", `Carta ${primera.indice + 1}: ${primera.carta.ilustracion}, pareja encontrada`);
+        segunda.boton.setAttribute("aria-label", `Carta ${segunda.indice + 1}: ${segunda.carta.ilustracion}, pareja encontrada`);
         parejasMemoriaEncontradas++;
         document.getElementById("parejasEncontradas").textContent = parejasMemoriaEncontradas;
         document.getElementById("estadoMemoria").textContent = `¡Pareja encontrada! Llevas ${parejasMemoriaEncontradas} de 8.`;
         cartasVolteadas = [];
 
-        if (parejasMemoriaEncontradas === emojisMemoria.length) {
-            document.getElementById("estadoMemoria").textContent = `¡Lo lograste! Encontraste las 8 parejas en ${intentosMemoria} intentos. 🏆`;
+        if (parejasMemoriaEncontradas === ilustracionesMemoria.length) {
+            document.getElementById("tableroMemoria").classList.add("memoria-completa");
+            document.getElementById("estadoMemoria").textContent = `¡Lo lograste! Encontraste las 8 parejas en ${intentosMemoria} intentos.`;
         }
         return;
     }
 
+    reproducirEfecto("error");
     memoriaBloqueada = true;
     document.getElementById("estadoMemoria").textContent = "No son pareja. ¡Intenta recordar dónde estaban!";
     temporizadorMemoria = setTimeout(() => {
