@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 240" role="img" aria-labelledby="title">
+  <title id="title">Lápices, libro, dinosaurio, sol y cohete</title>
+  <g stroke="#293b43" stroke-width="7" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M55 183L112 43l35 14-57 140z" fill="#ffcf43"/>
+    <path d="M112 43l17-24 18 38z" fill="#f3c99b"/>
+    <path d="M125 25l4-6 18 38-8-3z" fill="#39444a"/>
+    <path d="M74 132l35 14" fill="none" stroke="#fff5c8" stroke-width="5"/>
+    <path d="M92 88l35 14" fill="none" stroke="#fff5c8" stroke-width="5"/>
+    <path d="M183 83q51-29 100 0v111q-49-28-100 0z" fill="#fff7dc"/>
+    <path d="M283 83q50-29 100 0v111q-49-28-100 0z" fill="#fff"/>
+    <path d="M283 82v111" fill="none" stroke="#ee657c" stroke-width="6"/>
+    <path d="M203 108h57M203 128h57M203 148h44M307 108h56M307 128h56M307 148h44" fill="none" stroke="#68bad2" stroke-width="5"/>
+    <path d="M404 149q-1-39 28-53 4-39 38-37 28 2 30 34 28 13 21 47l22 27-18 17-30-12-23 18-28-15-28 10-22-19z" fill="#63c77c"/>
+    <path d="M430 108q8-19 25-14M479 94q14 1 21 13" fill="none" stroke="#337c55" stroke-width="6"/>
+    <circle cx="485" cy="120" r="4" fill="#293b43"/>
+    <path d="M447 161q12 12 26 0" fill="none" stroke="#293b43" stroke-width="5"/>
+    <path d="M483 176l15 27-20-12-17 16-2-29" fill="#f05c62"/>
+    <path d="M560 42l22 49-10 68-19 33-19-33-10-68z" fill="#ff6e67"/>
+    <path d="M524 101l-25 21 27 8M562 101l25 21-28 8" fill="#ffd14c"/>
+    <path d="M552 190l-11 27 20-12 17 12-9-29" fill="#ffd14c"/>
+    <circle cx="560" cy="80" r="10" fill="#fff5c8"/>
+  </g>
+  <g fill="#ffcf43" stroke="#e7a629" stroke-width="5" stroke-linejoin="round">
+    <path d="M402 31l7 15 17 2-12 11 3 17-15-8-15 8 3-17-12-11 17-2z"/>
+    <circle cx="168" cy="43" r="13"/>
+  </g>
+  <path d="M39 211h540" stroke="#f276a4" stroke-width="7" stroke-linecap="round" stroke-dasharray="2 17"/>
+</svg>

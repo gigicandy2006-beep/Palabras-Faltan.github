@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jugando con las palabras</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="contenedor">
+
+        <header>
+            <div class="banner-marca">
+                <img class="logo" src="ilustracion-escolar.svg" alt="Ilustración de lápices, cuaderno, dinosaurio y cohete">
+                <div class="banner-texto">
+                    <h1>Jugando con las palabras</h1>
+                    <p>¡Aprende ortografía mientras te diviertes!</p>
+                </div>
+            </div>
+        </header>
+
+        <main>
+
+            <!-- INICIO -->
+            <section id="inicio" class="pantalla activa">
+
+                <h2>¡Bienvenido!</h2>
+
+                <p class="descripcion">
+                    Una aventura para aprender a escribir correctamente
+                    mientras juegas y superas diferentes retos.
+                </p>
+
+                <div class="formulario">
+
+                    <label for="nombre">Escribe tu nombre:</label>
+                    <input type="text" id="nombre" placeholder="Tu nombre">
+
+                    <label for="institucion">Institución:</label>
+                    <select id="institucion">
+                        <option value="">Selecciona tu institución</option>
+                        <option value="ARMANDO SOLANO">ARMANDO SOLANO</option>
+                    </select>
+
+                    <label for="grado">Grado:</label>
+                    <select id="grado">
+                        <option value="">Selecciona tu grado</option>
+                        <option value="3°">3° Primaria</option>
+                        <option value="4°">4° Primaria</option>
+                        <option value="5°">5° Primaria</option>
+                    </select>
+
+                    <label for="dificultad">Dificultad:</label>
+                    <select id="dificultad">
+                        <option value="">Selecciona dificultad</option>
+                        <option value="facil">Fácil</option>
+                        <option value="medio">Medio</option>
+                        <option value="dificil">Difícil</option>
+                    </select>
+
+                    <button onclick="comenzarJuego()">
+                        Comenzar
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- MENÚ -->
+            <section id="menu" class="pantalla">
+
+                <h2>🌟 ¡Hola <span id="mostrarNombre"></span>!</h2>
+
+                <p>Elige un juego para comenzar:</p>
+
+                <div class="juegos">
+
+                    <button onclick="seleccionarJuego(1)">
+                        <span>🔤</span>
+                        <strong>B y V</strong>
+                        <small>Aprende a utilizar correctamente B y V</small>
+                    </button>
+
+                    <button onclick="seleccionarJuego(2)">
+                        <span>✏️</span>
+                        <strong>Verbos</strong>
+                        <small>Completa correctamente las oraciones</small>
+                    </button>
+
+                    <button onclick="seleccionarJuego(3)">
+                        <span>❗</span>
+                        <strong>Puntuación</strong>
+                        <small>Practica puntos, comas y tildes</small>
+                    </button>
+
+                    <button onclick="seleccionarJuego(4)">
+                        <span>🕵️‍♂️</span>
+                        <strong>Cazapalabras </strong>
+                        <small>Encuentra las palabras escondidas</small>
+                    </button>
+
+                    <button onclick="seleccionarJuego(5)">
+                        <span>📝</span>
+                        <strong>C, S y Z</strong>
+                        <small>Practica las reglas de c, s y z</small>
+                    </button>
+
+                    <button onclick="iniciarJuegoMemoria()">
+                        <span>🧠</span>
+                        <strong>Memoria</strong>
+                        <small>Encuentra las 8 parejas de emojis</small>
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- JUEGO -->
+            <section id="juego" class="pantalla">
+
+                <div class="barra-superior">
+
+                    <button onclick="volverMenu()" class="btn-volver">
+                        ⬅️ Menú
+                    </button>
+
+                    <div class="estrellas" id="estrellas">
+                        ⭐ ⭐ ⭐
+                    </div>
+
+                    <div class="puntos">
+                        Puntos: <span id="puntos">0</span>
+                    </div>
+
+                </div>
+
+                <h2 id="tituloJuego">Juego</h2>
+
+                <div class="progreso">
+                    Pregunta <span id="numeroPregunta">1</span> de 10
+                </div>
+
+                <div class="pregunta">
+
+                    <h3 id="textoPregunta">
+                        Pregunta
+                    </h3>
+
+                    <div id="opciones" class="opciones"></div>
+
+                </div>
+
+                <div id="mensaje" class="mensaje"></div>
+
+                <button id="siguiente" onclick="siguientePregunta()" class="btn-siguiente">
+                    Siguiente ➡️
+                </button>
+
+            </section>
+
+
+            <!-- MEMORIA -->
+            <section id="memoria" class="pantalla">
+
+                <div class="barra-superior memoria-barra">
+                    <button onclick="volverMenu()" class="btn-volver">
+                        ⬅️ Menú
+                    </button>
+
+                    <div class="memoria-estadistica">
+                        <div>Parejas: <strong id="parejasEncontradas">0</strong>/8</div>
+                        <div>Intentos: <strong id="intentosMemoria">0</strong></div>
+                    </div>
+
+                    <button onclick="iniciarMemoria()" class="btn-reiniciar-memoria">
+                        🔄 Reiniciar
+                    </button>
+                </div>
+
+                <h2>🧠 Juego de memoria</h2>
+                <p class="instruccion-memoria">Voltea dos cartas y encuentra las ocho parejas.</p>
+
+                <div id="tableroMemoria" class="memoria-tablero" role="group" aria-label="Tablero con 16 cartas de memoria"></div>
+                <p id="estadoMemoria" class="estado-memoria" aria-live="polite">¡Encuentra las parejas!</p>
+
+            </section>
+
+
+            <!-- RESULTADOS -->
+            <section id="resultados" class="pantalla">
+
+                <div class="trofeo">🏆</div>
+
+                <h2>¡Juego terminado!</h2>
+
+                <p id="mensajeFinal"></p>
+
+                <div class="resultado">
+
+                    <div>
+                        <span>⭐</span>
+                        <strong id="estrellasFinales">3</strong>
+                        <small>Estrellas</small>
+                    </div>
+
+                    <div>
+                        <span>🎯</span>
+                        <strong id="puntosFinales">0</strong>
+                        <small>Puntos</small>
+                    </div>
+
+                </div>
+
+                <div id="diploma" class="diploma" aria-live="polite">
+                    <div class="diploma-encabezado">
+                        <div class="diploma-badge">🏅</div>
+                        <div class="diploma-ornamento">✨</div>
+                    </div>
+                    <h3 id="diplomaTitulo">Certificado de reconocimiento</h3>
+                    <p class="diploma-subtitulo">por completar con éxito este reto</p>
+                    <div class="diploma-mascota" aria-hidden="true">🐼</div>
+                    <p id="diplomaTexto">¡Felicitaciones! Has completado este reto con excelencia.</p>
+                </div>
+
+                <button onclick="volverMenu()">
+                    🎮 Volver a jugar
+                </button>
+
+                <button onclick="volverInicio()" class="secundario">
+                    🏠 Inicio
+                </button>
+
+            </section>
+
+        </main>
+
+        <footer>
+            <p>📖 Jugando con las palabras | ¡Aprender también puede ser divertido!</p>
+        </footer>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
