@@ -13,7 +13,7 @@
 
         <header>
             <div class="banner-marca">
-                <img class="logo" src="../proyecto2.1/.vscode/ilustracion-escolar.svg" alt="Ilustración de lápices, cuaderno, dinosaurio y cohete">
+                <img class="logo" src="ilustracion-escolar.svg" alt="Ilustración de lápices, cuaderno, dinosaurio y cohete">
                 <div class="banner-texto">
                     <h1>Jugando con las palabras</h1>
                     <p>¡Aprende ortografía mientras te diviertes!</p>
@@ -109,9 +109,9 @@
                     </button>
 
                     <button onclick="iniciarJuegoMemoria()">
-                        <span aria-hidden="true">🧠</span>
+                        <span>🧠</span>
                         <strong>Memoria</strong>
-                        <small>Encuentra las 8 parejas de ilustraciones</small>
+                        <small>Encuentra las 8 parejas de emojis</small>
                     </button>
 
                 </div>
@@ -195,9 +195,7 @@
 
                 <div class="trofeo">🏆</div>
 
-                <img id="mascotaDerrota" class="mascota-derrota" src="reaccion-triste.svg" alt="" aria-hidden="true">
-
-                <h2 id="tituloResultados">¡Juego terminado!</h2>
+                <h2>¡Juego terminado!</h2>
 
                 <p id="mensajeFinal"></p>
 
@@ -219,13 +217,12 @@
 
                 <div id="diploma" class="diploma" aria-live="polite">
                     <div class="diploma-encabezado">
-                        <span class="diploma-estrella" aria-hidden="true">★</span>
-                        <span class="diploma-sello">¡Lo lograste!</span>
-                        <span class="diploma-estrella" aria-hidden="true">★</span>
+                        <div class="diploma-badge">🏅</div>
+                        <div class="diploma-ornamento">✨</div>
                     </div>
                     <h3 id="diplomaTitulo">Certificado de reconocimiento</h3>
                     <p class="diploma-subtitulo">por completar con éxito este reto</p>
-                    <img class="diploma-ilustracion" src="nino-feliz.svg" alt="Niño saltando de alegría">
+                    <div class="diploma-mascota" aria-hidden="true">🐼</div>
                     <p id="diplomaTexto">¡Felicitaciones! Has completado este reto con excelencia.</p>
                 </div>
 
